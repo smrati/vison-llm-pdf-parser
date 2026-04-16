@@ -1,5 +1,5 @@
 [project]
-name = "vison-llm-pdf-parser"
+name = "vision-llm-pdf-parser"
 version = "0.1.0"
 description = "Convert PDFs to Markdown using local vision LLMs"
 readme = "README.md"
