@@ -489,7 +489,7 @@ wheels = [
 ]
 
 [[package]]
-name = "vison-llm-pdf-parser"
+name = "vision-llm-pdf-parser"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [

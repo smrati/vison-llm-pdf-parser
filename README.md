@@ -1,4 +1,4 @@
-# vison-llm-pdf-parser
+# vision-llm-pdf-parser
 
 Convert PDFs to Markdown using local vision LLMs. Works with Ollama, LM Studio, vLLM, and any OpenAI-compatible API.
 
@@ -9,7 +9,7 @@ Convert PDFs to Markdown using local vision LLMs. Works with Ollama, LM Studio, 
 ```bash
 # Clone and install
 git clone <repo-url>
-cd vison-llm-pdf-parser
+cd vision-llm-pdf-parser
 uv sync
 
 # Install dev tools (linting, testing)
