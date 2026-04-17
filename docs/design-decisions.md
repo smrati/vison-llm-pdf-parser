@@ -27,15 +27,6 @@ The heuristic checks if the previous page ends "cleanly" (with a period, heading
 
 In practice, most well-formatted documents have clean page boundaries, so the heuristic skips the majority of merge calls.
 
-## Why two separate client implementations?
-
-Ollama's native API (`/api/chat`) uses a different image format than OpenAI's (`/v1/chat/completions`):
-
-- **OpenAI:** Images go in a `content` array as `image_url` objects with data URIs
-- **Ollama:** Images go in a top-level `images` field in the message
-
-Rather than adding conditional logic inside a single client, the library uses separate client classes with a factory function. This keeps each client simple and testable. The converter never needs to know which client it's using — they share the same interface.
-
 ## Why PyMuPDF over pdf2image?
 
 - **No system dependencies:** `pdf2image` requires `poppler-utils` installed on the system. PyMuPDF is pure Python.

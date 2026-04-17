@@ -16,8 +16,7 @@ src/pdf2md/
 │
 ├── llm/
 │   ├── __init__.py
-│   ├── client.py                LLMClient, AsyncLLMClient, OllamaLLMClient,
-│   │                            AsyncOllamaLLMClient, factory functions
+│   ├── client.py                LLMClient + AsyncLLMClient (openai SDK)
 │   └── prompts.py               System, page, and merge prompt templates
 │
 └── convert/
@@ -41,21 +40,13 @@ src/pdf2md/
                     |              |              |
                     v              v              v
             PDFDocument     LLM Client       PageMerger
-            (PyMuPDF)       (backend)        (heuristic)
+            (PyMuPDF)     (openai SDK)      (heuristic)
                                 |
-                +---------------+---------------+
-                |                               |
-         OpenAI-compatible               Ollama native
-          ┌─────────────┐             ┌──────────────────┐
-          │  LLMClient   │             │ OllamaLLMClient   │
-          │ (sync)       │             │ (sync)            │
-          │              │             │                    │
-          │ AsyncLLMClient│             │ AsyncOllamaLLMClient│
-          │ (async)      │             │ (async)            │
-          └─────────────┘             └──────────────────┘
-                |                               |
-          openai SDK                      ollama package
-         (/v1/chat/completions)          (/api/chat)
+                          LLMClient (sync)
+                          AsyncLLMClient (async)
+                                |
+                           openai SDK
+                        (/v1/chat/completions)
 ```
 
 ## Data Models (Pydantic)
@@ -121,7 +112,7 @@ All exceptions have class method constructors for ergonomic error creation.
    .metadata                           Extracts PDF metadata
    .close()                            Releases PDF handle
 
-2. create_sync_client(llm_config)      Factory picks Ollama or OpenAI client
+2. LLMClient(llm_config)              OpenAI-compatible client
 
 3. _convert_all_pages(llm, pages)      Sequential: page 0, page 1, ...
    for each page:
@@ -152,7 +143,6 @@ Same flow but:
 pydantic        models.py, exceptions.py
 pymupdf (fitz)  pdf/loader.py
 openai          llm/client.py (LLMClient, AsyncLLMClient)
-ollama          llm/client.py (OllamaLLMClient, AsyncOllamaLLMClient) [optional]
 ```
 
-No external dependencies beyond these. Pydantic handles validation, PyMuPDF handles PDF operations, and the LLM clients handle API communication.
+No external dependencies beyond these. Pydantic handles validation, PyMuPDF handles PDF operations, and the LLM client handles API communication.
