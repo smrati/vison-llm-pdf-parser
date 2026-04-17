@@ -1,13 +1,71 @@
 # vision-llm-pdf-parser
 
-Convert PDFs to Markdown using local vision LLMs. Works with Ollama, LM Studio, vLLM, and any OpenAI-compatible API.
+## About
 
-## Setup
+Convert PDFs to clean, structured Markdown using local vision LLMs — no cloud APIs, no API keys, no data leaving your machine.
+
+**The problem:** Traditional PDF-to-text extraction is unreliable. PDFs store drawing commands, not structured text. Tables get mangled, columns merge, equations disappear, and layouts break. Tools like `pdf2image`, `pymupdf` text extraction, or `marker` all struggle with complex layouts.
+
+**This library's approach:** Instead of trying to parse PDF internals, it renders each page as an image and sends it to a vision-capable LLM (running locally on your machine). The LLM sees the page exactly as a human would — it understands tables, equations, multi-column layouts, and visual hierarchy — and produces clean Markdown.
+
+**How it's different:**
+
+| | This library | Text extraction tools | Cloud OCR services |
+|---|---|---|---|
+| Layout understanding | LLM sees full page visually | Fragile, rule-based | Good but cloud-only |
+| Tables & equations | Preserved accurately | Often broken | Varies |
+| Privacy | 100% local, no data leaves your machine | Local | Data sent to cloud |
+| Cost | Free (local models) | Free | Per-page charges |
+| Speed | Depends on local GPU/CPU | Fast | Fast (network latency) |
+
+Works with any local vision LLM: Ollama, LM Studio, vLLM, or any server that exposes an OpenAI-compatible `/v1/chat/completions` endpoint.
+
+## Installation
+
+### Use in your own project
 
 **Prerequisites:** Python 3.13+, [uv](https://docs.astral.sh/uv/)
 
 ```bash
-# Clone and install
+# 1. Clone the repo
+git clone https://github.com/<your-username>/vision-llm-pdf-parser.git
+
+# 2. Install into your project (from your project directory)
+cd your-project
+uv add --editable ../vision-llm-pdf-parser
+```
+
+Use **editable mode** (`--editable`) so that pulling updates in the cloned repo takes effect immediately — no reinstall needed.
+
+Or configure it in your `pyproject.toml`:
+
+```toml
+[project]
+dependencies = [
+    "vision-llm-pdf-parser",
+]
+
+[tool.uv.sources]
+vision-llm-pdf-parser = { path = "../vision-llm-pdf-parser", editable = true }
+```
+
+With this setup, pulling updates is just:
+
+```bash
+cd vision-llm-pdf-parser
+git pull
+# Changes are live immediately — no uv sync needed
+```
+
+If you used a **non-editable** install (`uv add ../vision-llm-pdf-parser`), you must reinstall after pulling:
+
+```bash
+uv sync --reinstall-package vision-llm-pdf-parser
+```
+
+### Develop this library
+
+```bash
 git clone <repo-url>
 cd vision-llm-pdf-parser
 uv sync
