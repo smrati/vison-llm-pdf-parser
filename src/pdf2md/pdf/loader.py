@@ -52,9 +52,11 @@ class PDFDocument:
         page = self._doc[page_num]
         rect = page.rect
         zoom = self._options.dpi / 72
+        fmt = self._options.image_format.lower()
         return PDFPage(
             page_number=page_num,
             image_base64=base64.b64encode(image_bytes).decode("ascii"),
+            image_mime=f"image/{'jpeg' if fmt == 'jpeg' else 'png'}",
             width=int(rect.width * zoom),
             height=int(rect.height * zoom),
         )

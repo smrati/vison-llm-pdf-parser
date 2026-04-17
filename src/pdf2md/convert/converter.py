@@ -9,7 +9,7 @@ from pdf2md.config import ConversionOptions, LLMConfig
 from pdf2md.convert.image_extractor import ImageExtractor
 from pdf2md.convert.merger import AsyncPageMerger, PageMerger
 from pdf2md.exceptions import ConversionError
-from pdf2md.llm.client import AsyncLLMClient, LLMClient
+from pdf2md.llm.client import AsyncLLMClient, LLMClient, create_async_client, create_sync_client
 from pdf2md.models import ConversionResult, PageResult
 from pdf2md.pdf.loader import PDFDocument
 
@@ -32,7 +32,7 @@ class PDFToMarkdownConverter:
             pages = pdf.get_all_pages()
             metadata = pdf.metadata
 
-        with LLMClient(self._llm_config) as llm:
+        with create_sync_client(self._llm_config) as llm:
             page_results = self._convert_all_pages(llm, pages)
 
             extracted_images = self._extract_images(pdf_path)
@@ -52,13 +52,14 @@ class PDFToMarkdownConverter:
             page = pdf.get_page(page_num)
             total = pdf.page_count
 
-        with LLMClient(self._llm_config) as llm:
+        with create_sync_client(self._llm_config) as llm:
             md = llm.convert_page(
                 image_base64=page.image_base64,
                 page_num=page.page_number,
                 total_pages=total,
                 system_prompt=self._options.system_prompt,
                 page_prompt=self._options.page_prompt,
+                image_mime=page.image_mime,
             )
 
         return PageResult(
@@ -74,7 +75,7 @@ class PDFToMarkdownConverter:
             pdf_pages = [pdf.get_page(p) for p in pages]
             total = pdf.page_count
 
-        with LLMClient(self._llm_config) as llm:
+        with create_sync_client(self._llm_config) as llm:
             return self._convert_all_pages(llm, pdf_pages, total)
 
     def _convert_all_pages(
@@ -92,6 +93,7 @@ class PDFToMarkdownConverter:
                 total_pages=total,
                 system_prompt=self._options.system_prompt,
                 page_prompt=self._options.page_prompt,
+                image_mime=page.image_mime,
             )
             results.append(
                 PageResult(
@@ -138,7 +140,7 @@ class AsyncPDFToMarkdownConverter:
             pages = pdf.get_all_pages()
             metadata = pdf.metadata
 
-        async with AsyncLLMClient(self._llm_config) as llm:
+        async with create_async_client(self._llm_config) as llm:
             page_results = await self._convert_all_pages_async(llm, pages)
 
             extracted_images = self._extract_images(pdf_path)
@@ -158,13 +160,14 @@ class AsyncPDFToMarkdownConverter:
             page = pdf.get_page(page_num)
             total = pdf.page_count
 
-        async with AsyncLLMClient(self._llm_config) as llm:
+        async with create_async_client(self._llm_config) as llm:
             md = await llm.convert_page(
                 image_base64=page.image_base64,
                 page_num=page.page_number,
                 total_pages=total,
                 system_prompt=self._options.system_prompt,
                 page_prompt=self._options.page_prompt,
+                image_mime=page.image_mime,
             )
 
         return PageResult(
@@ -180,7 +183,7 @@ class AsyncPDFToMarkdownConverter:
             pdf_pages = [pdf.get_page(p) for p in pages]
             total = pdf.page_count
 
-        async with AsyncLLMClient(self._llm_config) as llm:
+        async with create_async_client(self._llm_config) as llm:
             return await self._convert_all_pages_async(llm, pdf_pages, total)
 
     async def _convert_all_pages_async(
@@ -200,6 +203,7 @@ class AsyncPDFToMarkdownConverter:
                     total_pages=total,
                     system_prompt=self._options.system_prompt,
                     page_prompt=self._options.page_prompt,
+                    image_mime=page.image_mime,
                 )
                 return PageResult(
                     page_number=page.page_number,
