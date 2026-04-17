@@ -86,9 +86,8 @@ A standard letter page at 150 DPI produces a ~1250x1650 pixel image.
 
 ### Step 2: LLM Vision Conversion
 
-Each page image is sent to the vision LLM as a base64 data URI. The message format differs by backend:
+Each page image is sent to the vision LLM as a base64 data URI via the OpenAI `/v1/chat/completions` protocol. All supported backends (Ollama, LM Studio, vLLM) use this same format:
 
-**OpenAI-compatible (LM Studio, vLLM):**
 ```json
 {
   "messages": [
@@ -100,17 +99,6 @@ Each page image is sent to the vision LLM as a base64 data URI. The message form
         "detail": "high"
       }}
     ]}
-  ]
-}
-```
-
-**Ollama native:**
-```json
-{
-  "model": "gemma3",
-  "messages": [
-    {"role": "system", "content": "Convert to Markdown..."},
-    {"role": "user", "content": "Convert page 1 of 5...", "images": ["<base64>"]}
   ]
 }
 ```

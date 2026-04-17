@@ -5,11 +5,7 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class LLMConfig:
-    """Configuration for the LLM endpoint.
-
-    backend: "openai" (default) uses the OpenAI-compatible /v1/chat/completions API.
-             "ollama" uses Ollama's native /api/chat API with proper image handling.
-    """
+    """Configuration for the OpenAI-compatible LLM endpoint."""
 
     base_url: str = "http://localhost:11434/v1"
     model: str = "llama3.2-vision"
@@ -18,7 +14,6 @@ class LLMConfig:
     max_tokens: int = 4096
     timeout: float = 120.0
     max_retries: int = 2
-    backend: str = "openai"
 
 
 @dataclass(frozen=True)

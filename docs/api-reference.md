@@ -10,7 +10,7 @@ One-shot synchronous conversion. Creates a converter with the given keyword argu
 from pdf2md import convert
 
 result = convert("document.pdf")
-result = convert("document.pdf", backend="ollama", model="gemma3", dpi=200)
+result = convert("document.pdf", model="gemma3", dpi=200)
 ```
 
 Accepts any field from `LLMConfig` or `ConversionOptions` as keyword arguments. Automatically routes them to the correct config object.
@@ -38,7 +38,7 @@ Stateful synchronous converter. Reuses the LLM connection across multiple calls.
 from pdf2md import PDFToMarkdownConverter, LLMConfig, ConversionOptions
 
 converter = PDFToMarkdownConverter(
-    llm_config=LLMConfig(model="gemma3", backend="ollama"),
+    llm_config=LLMConfig(model="gemma3"),
     options=ConversionOptions(dpi=200),
 )
 

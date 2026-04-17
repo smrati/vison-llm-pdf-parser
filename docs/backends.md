@@ -1,30 +1,23 @@
 # Backends
 
-The library supports any vision-capable LLM that exposes an OpenAI-compatible chat completions API, plus Ollama's native API.
+The library uses a single API protocol — OpenAI's `/v1/chat/completions` — to communicate with any vision-capable LLM. Ollama, LM Studio, and vLLM all implement this same endpoint, so switching backends is just changing `base_url` and `model`.
 
 ## Backend Overview
 
-| Backend | API Protocol | Image Format | Port | Package |
-|---------|-------------|-------------|------|---------|
-| Ollama | Native `/api/chat` | `images` field in message | 11434 | `ollama` (optional) |
-| LM Studio | OpenAI `/v1/chat/completions` | `image_url` content block | 1234 | `openai` (required) |
-| vLLM | OpenAI `/v1/chat/completions` | `image_url` content block | 8000 | `openai` (required) |
-| Any other | OpenAI `/v1/chat/completions` | `image_url` content block | varies | `openai` (required) |
+| Backend | base_url | Default Port | Setup |
+|---------|----------|-------------|-------|
+| Ollama | `http://localhost:11434/v1` | 11434 | `ollama serve` |
+| LM Studio | `http://localhost:1234/v1` | 1234 | Start Local Server in app |
+| vLLM | `http://localhost:8000/v1` | 8000 | `python -m vllm.entrypoints.openai.api_server` |
+| Any other | varies | varies | Must expose `/v1/chat/completions` |
 
-## Ollama (Native API)
+All backends use the same image format: `image_url` content blocks with base64 data URIs. No special per-backend configuration needed.
 
-Uses the `ollama` Python package to call Ollama's native `/api/chat` endpoint. This is the recommended way to use Ollama because it uses Ollama's native image handling format.
+## Ollama
 
 ### Setup
 
 ```bash
-# Install with Ollama support
-pip install vision-llm-pdf-parser[ollama]
-
-# Or with uv
-uv sync --extra ollama
-
-# Pull and start a vision model
 ollama pull llama3.2-vision
 ollama serve
 ```
@@ -35,29 +28,14 @@ ollama serve
 from pdf2md import LLMConfig
 
 config = LLMConfig(
-    base_url="http://localhost:11434/v1",   # Ollama default
-    model="llama3.2-vision",                # Or: gemma3, llava, etc.
-    backend="ollama",                       # Use native API
+    base_url="http://localhost:11434/v1",
+    model="llama3.2-vision",  # Or: gemma3, llava, minicpm-v
 )
 ```
 
-### How it works
+Ollama exposes an OpenAI-compatible API at `/v1/chat/completions`. The library communicates with it using the same `openai` Python SDK and the same `image_url` message format as every other backend.
 
-The `OllamaLLMClient` converts the `base_url` to an Ollama host by stripping `/v1`, then uses `ollama.Client.chat()` with the `images` parameter:
-
-```python
-# Internal implementation (simplified)
-response = client.chat(
-    model="llama3.2-vision",
-    messages=[
-        {"role": "system", "content": system_prompt},
-        {"role": "user", "content": user_prompt, "images": [base64_string]},
-    ],
-    options={"temperature": 0.1, "num_predict": 4096},
-)
-```
-
-### Supported models
+### Supported vision models
 
 | Model | Notes |
 |-------|-------|
@@ -66,17 +44,9 @@ response = client.chat(
 | `llava` | Popular open-source vision model |
 | `minicpm-v` | Lightweight vision model |
 
-### Important
-
-- `max_tokens` is mapped to Ollama's `num_predict` parameter
-- The `base_url` `/v1` suffix is automatically stripped to get the Ollama host
-- The `ollama` package is optional; you'll get a clear error if it's not installed
-
 ---
 
-## LM Studio (OpenAI-Compatible)
-
-LM Studio exposes an OpenAI-compatible API at `/v1/chat/completions`.
+## LM Studio
 
 ### Setup
 
@@ -92,14 +62,9 @@ from pdf2md import LLMConfig
 
 config = LLMConfig(
     base_url="http://localhost:1234/v1",
-    model="allenai/olmocr-2-7b",           # Model identifier from LM Studio
-    backend="openai",                       # OpenAI-compatible (default)
+    model="allenai/olmocr-2-7b",
 )
 ```
-
-### How it works
-
-Uses the `openai` Python SDK to send requests to LM Studio's `/v1/chat/completions` endpoint. Images are sent as `image_url` content blocks with base64 data URIs.
 
 ### WSL Note
 
@@ -114,9 +79,7 @@ If running LM Studio on Windows and the script inside WSL2, `localhost` may not 
 
 ---
 
-## vLLM (OpenAI-Compatible)
-
-vLLM serves models with an OpenAI-compatible API.
+## vLLM
 
 ### Setup
 
@@ -134,7 +97,6 @@ from pdf2md import LLMConfig
 config = LLMConfig(
     base_url="http://localhost:8000/v1",
     model="Qwen/Qwen2-VL-2B-Instruct",
-    backend="openai",
 )
 ```
 
@@ -149,7 +111,6 @@ config = LLMConfig(
     base_url="https://api.example.com/v1",
     model="gpt-4o",
     api_key="sk-your-key-here",
-    backend="openai",
 )
 ```
 
