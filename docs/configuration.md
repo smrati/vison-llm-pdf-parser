@@ -59,59 +59,6 @@ LLMConfig(
 )
 ```
 
-### Field Reference
-
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `base_url` | `str` | `http://localhost:11434/v1` | API endpoint URL. Should include `/v1` for OpenAI-compatible backends. |
-| `model` | `str` | `llama3.2-vision` | Model identifier as recognized by the backend. Must be a **vision-capable** model. |
-| `api_key` | `str` | `not-needed` | API key. Not required for local models. LM Studio accepts any string. |
-| `temperature` | `float` | `0.1` | Sampling temperature. 0.0 = deterministic, higher = more creative. Low values recommended for faithful conversion. |
-| `max_tokens` | `int` | `4096` | Maximum tokens per LLM response. Complex pages with tables may need more. |
-| `timeout` | `float` | `120.0` | Request timeout in seconds. Vision requests can be slow on CPU-bound models. |
-| `max_retries` | `int` | `2` | Number of retries on transient failures. |
-| `backend` | `str` | `openai` | API protocol: `"openai"` for OpenAI-compatible endpoints, `"ollama"` for Ollama's native API. |
-
-### Backend Selection
-
-| Backend | When to use | Image format |
-|---------|-------------|-------------|
-| `"openai"` | LM Studio, vLLM, any `/v1/chat/completions` server | `image_url` content block with base64 data URI |
-| `"ollama"` | Ollama with native API | `images` field in message with base64 string |
-
-### Common Configurations
-
-```python
-# Ollama (native API)
-LLMConfig(
-    base_url="http://localhost:11434/v1",
-    model="gemma3",
-    backend="ollama",
-)
-
-# LM Studio
-LLMConfig(
-    base_url="http://localhost:1234/v1",
-    model="allenai/olmocr-2-7b",
-    backend="openai",
-)
-
-# vLLM
-LLMConfig(
-    base_url="http://localhost:8000/v1",
-    model="Qwen/Qwen2-VL-2B-Instruct",
-    backend="openai",
-)
-
-# Remote OpenAI-compatible API
-LLMConfig(
-    base_url="https://api.example.com/v1",
-    model="gpt-4o",
-    api_key="sk-...",
-    backend="openai",
-)
-```
-
 ---
 
 ## ConversionOptions
