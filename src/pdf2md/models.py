@@ -27,6 +27,7 @@ class PDFPage(BaseModel):
 
     page_number: int = Field(ge=0, description="0-indexed page number")
     image_base64: str = Field(description="Base64-encoded page image")
+    image_mime: str = Field(default="image/png", description="MIME type of the rendered image")
     width: int = Field(description="Page width in pixels at render DPI")
     height: int = Field(description="Page height in pixels at render DPI")
 
