@@ -59,11 +59,6 @@ This is important because the converter and LLM client both hold references to t
 
 `PDFPage` (internal) also uses Pydantic for consistency, though it's not exported.
 
-## Why the `backend` field instead of auto-detection?
+## Why a single OpenAI-compatible client for all backends?
 
-Auto-detecting the backend from `base_url` (e.g., checking for port 11434) is fragile:
-- Users can run Ollama on any port
-- Other services might use port 11434
-- The `/v1` path convention isn't universal
-
-Explicit configuration is clearer and less error-prone. The default `"openai"` backend works for the majority of setups (LM Studio, vLLM, remote APIs). Users opt into `"ollama"` when they want native Ollama support.
+Ollama, LM Studio, and vLLM all expose the same `/v1/chat/completions` endpoint with the same `image_url` format for vision. There is no need for per-backend client implementations. A single `LLMClient` using the `openai` Python SDK covers all backends — switching is just changing `base_url` and `model`. This keeps the codebase simple and avoids extra dependencies.
