@@ -63,6 +63,39 @@ If you used a **non-editable** install (`uv add ../vision-llm-pdf-parser`), you 
 uv sync --reinstall-package vision-llm-pdf-parser
 ```
 
+### Install from GitHub (no local clone needed)
+
+Install directly from the GitHub repo — no need to clone the library separately:
+
+```bash
+# Latest on default branch
+uv add git+https://github.com/smrati/vison-llm-pdf-parser.git
+
+# Specific branch
+uv add git+https://github.com/smrati/vison-llm-pdf-parser.git --branch private/smrati/dev
+
+# Pin to a specific commit
+uv add git+https://github.com/smrati/vison-llm-pdf-parser.git --rev 799aba69c65876e22c4eb014025e9f7f355790dc
+```
+
+Or configure it in your `pyproject.toml`:
+
+```toml
+[project]
+dependencies = [
+    "vision-llm-pdf-parser",
+]
+
+[tool.uv.sources]
+vision-llm-pdf-parser = { git = "https://github.com/smrati/vison-llm-pdf-parser.git", rev = "799aba69c65876e22c4eb014025e9f7f355790dc" }
+```
+
+To get updates, change the `rev` to the latest commit hash and run:
+
+```bash
+uv sync
+```
+
 ### Develop this library
 
 ```bash
